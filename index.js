@@ -24,6 +24,7 @@ async function run() {
         const database = client.db('tree');
         const treeCollection = database.collection('bonsai');
         const orderCollection = database.collection('order');
+        const usersCollection = database.collection('users');
 
         // post data to db from ui
         app.post('/bonsai', async (req, res) => {
@@ -43,7 +44,7 @@ async function run() {
         app.post('/order', async (req, res) => {
             const cursor = req.body;
             const result = await treeCollection.insertOne(cursor);
-            res.send(result);
+            res.json(result);
         })
 
         // get order from db to ui
@@ -51,6 +52,43 @@ async function run() {
             const cursor = orderCollection.find({});
             const order = await cursor.toArray();
             res.send(order);
+        })
+
+                  // user collection api start
+        // post user from ui to db
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            res.json(result);
+        })
+        // upsert user api
+        app.put('/users', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const option = { upsert: true };
+            const updateDoc = { $set: user };
+            const result = await usersCollection.updateOne(filter, updateDoc, option);
+            res.json(result);
+        })
+        // make admin user api
+        app.put('/users/admin', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const updateDoc = { $set: { role: 'admin' } };
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            res.json(result)
+        })
+
+        // admin filtering
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+            let isAdmin = false;
+            if (user?.role === 'admin') {
+                isAdmin = true
+            }
+            res.json({admin: isAdmin})
         })
 
     }
@@ -64,7 +102,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('my node is successfully running...')
+    res.send('my node is successfully running.')
 })
 
 
