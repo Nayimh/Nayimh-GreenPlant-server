@@ -1,9 +1,9 @@
-const express = require('express')
+const express = require('express');
 const app = express();
-const cors = require('cors')
+const cors = require('cors');
 const { MongoClient } = require("mongodb");
 
-require('dotenv').config()
+require('dotenv').config();
 
 const ObjectId = require('mongodb').ObjectId;
 
@@ -22,19 +22,37 @@ async function run() {
     try {
         await client.connect();
         const database = client.db('tree');
-        const treeCollection = database.collection('bonsai')
+        const treeCollection = database.collection('bonsai');
+        const orderCollection = database.collection('order');
 
-        
+        // post data to db from ui
         app.post('/bonsai', async (req, res) => {
-           
-           
+            const cursor = req.body;
+            const result = await treeCollection.insertOne(cursor);
+            res.send(result);
         })
 
+        // get data from mongo and render in ui
         app.get('/bonsai', async (req, res) => {
             const cursor = treeCollection.find({});
             const tree = await cursor.toArray();
             res.send(tree);
         })
+
+        // post order from ui to db
+        app.post('/order', async (req, res) => {
+            const cursor = req.body;
+            const result = await treeCollection.insertOne(cursor);
+            res.send(result);
+        })
+
+        // get order from db to ui
+        app.get('/order', async (req, res) => {
+            const cursor = orderCollection.find({});
+            const order = await cursor.toArray();
+            res.send(order);
+        })
+
     }
     finally {
        
