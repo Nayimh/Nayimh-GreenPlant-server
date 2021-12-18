@@ -29,7 +29,7 @@ async function run() {
         app.post('/bonsai', async (req, res) => {
             const cursor = req.body;
             const result = await treeCollection.insertOne(cursor);
-            res.send(result);
+            res.json(result);
         })
 
         // get data from mongo and render in ui
