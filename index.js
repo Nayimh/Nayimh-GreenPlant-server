@@ -54,6 +54,18 @@ async function run() {
             res.send(order);
         })
 
+
+              // Orders API with Email - GET
+    app.get("/order/:email", async (req, res) => {
+        const email = req.params.email;
+        const cursor = orderCollection.find({});
+        const orders = await cursor.toArray();
+        const customerOrder = orders.filter((mail) => mail.email === email);
+        res.send(customerOrder);
+    });
+
+
+
                   // user collection api start
         // post user from ui to db
         app.post('/users', async (req, res) => {
