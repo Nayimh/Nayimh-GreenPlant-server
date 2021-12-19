@@ -40,10 +40,30 @@ async function run() {
             res.send(tree);
         })
 
+        app.delete("/bonsai/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const deleteCar = await exploreCollection.deleteOne(query);
+            res.json(deleteCar);
+          });
+
+        // get single card api
+            
+        app.get("/bonsai/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const car = await exploreCollection.findOne(query);
+            res.send(car);
+        });
+
+
+
+
+
         // post order from ui to db
         app.post('/order', async (req, res) => {
             const cursor = req.body;
-            const result = await treeCollection.insertOne(cursor);
+            const result = await orderCollection.insertOne(cursor);
             res.json(result);
         })
 
@@ -63,6 +83,24 @@ async function run() {
         const customerOrder = orders.filter((mail) => mail.email === email);
         res.send(customerOrder);
     });
+        
+         // Orders API with Email - GET
+    app.get("/order/:email", async (req, res) => {
+        const email = req.params.email;
+        const cursor = orderCollection.find({});
+        const orders = await cursor.toArray();
+        const customerOrder = orders.filter((mail) => mail.email === email);
+        res.send(customerOrder);
+    });
+        
+     // Delete Specific Order API
+     app.delete("/order/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const deleteOrder = await orderCollection.deleteOne(query);
+        res.json(deleteOrder);
+     });
+        
 
 
 
